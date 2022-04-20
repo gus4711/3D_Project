@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 09e455b705175d64a9a8b0599cf84786
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - _inventory: {instanceID: 0}
+  - _crafte: {fileID: 3413093777117522523, guid: 99a29bae77a4a8645a940c7c6115016c, type: 3}
+  - user: {instanceID: 0}
+  - slotObject: {instanceID: 0}
+  - slotParent: {instanceID: 0}
+  - movingItem: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
