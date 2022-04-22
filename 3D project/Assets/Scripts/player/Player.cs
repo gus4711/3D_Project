@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Player : BaseInfo
 {
-    
+    //managers
+    EventManager _eventManager;
 
     //EVENT//
 
@@ -143,17 +144,23 @@ public class Player : BaseInfo
 
     private void Awake()
     {
+        //managers
+        _eventManager = EventManager.Instance;
+
+
         _CollectionQuestList = new List<CollectionQuest>();
         
 
         _userController = gameObject.GetComponent<CharacterController>();
 
-        //공격 이벤트
-        playerAnimator.HitEvent += TargetAttack;
-        playerAnimator.AttackStartEvent += AttackStart;
-        playerAnimator.AttackEndEvent += AttackEnd;
+        //공격 애니메이션 이벤트 연결
+        playerAnimator.HitEvent += OnTargetAttack;
+        playerAnimator.AttackStartEvent += OnAttackStart;
+        playerAnimator.AttackEndEvent += OnAttackEnd;
 
-        _userRigidbody = playerBody.GetComponent<Rigidbody>();
+        //공격 이벤트
+
+         _userRigidbody = playerBody.GetComponent<Rigidbody>();
 
         if (weapon.transform.childCount > 0)
         {
@@ -167,7 +174,6 @@ public class Player : BaseInfo
     void Update()
     {
         _attackTime += Time.deltaTime;
-        Debug.Log("isControlCharacter: " + UIManager.GetInstance().isControlCharacter);
         if (UIManager.GetInstance().isControlCharacter)
         {
             CameraUpdate();
@@ -377,9 +383,8 @@ public class Player : BaseInfo
         _shieldTime += Time.deltaTime;
         if (_mouseLeftDown)
         {
-            if(/*_attackTime > _attackCoolTime &&*/ stamina > 0 && !_isAttacking)
+            if(stamina > 0 && !_isAttacking)
             {
-                //Debug.Log("_attackTime:  " + _attackTime+ ", _isAttacking: "+ _isAttacking);
                 //스테미나
                 stamina -= 5;
                 if (stamina < 0)
@@ -395,8 +400,6 @@ public class Player : BaseInfo
                 ray = Camera.main.ViewportPointToRay(_cameraCenter);
                 if (Physics.Raycast(ray, out raycasthit,2f, 1<<LayerMask.NameToLayer("PossibleHit")))
                 {
-                    TargetObject = raycasthit.collider.gameObject;
-
                     armAnimator.SetBool("isHit", true);
                 }else
                 {
@@ -455,17 +458,19 @@ public class Player : BaseInfo
         }
     }
 
-    void TargetAttack()
+    
+    void OnTargetAttack()
     {
-        
-
+        TargetObject = raycasthit.collider.gameObject;
 
         if (TargetObject.tag == "Object")
         {
-            TargetObject.GetComponent<ObjectController>().BeAttacked(this);
+            //TargetObject.GetComponent<ObjectController>().BeAttacked(this);
+
+            _eventManager.OnDestroyObject(this, TargetObject.GetComponent<ObjectController>());
+
             if (TargetObject.GetComponent<ObjectController>().objectName == "Tree")
             {
-                //무기 선별 후 소리 선정 작업 필요
                 AudioManager.GetInstance().OnShotPlay("WoodAxe_Tree");
             }
             else if (TargetObject.GetComponent<ObjectController>().objectName == "Stone")
@@ -475,21 +480,29 @@ public class Player : BaseInfo
         }
         else if (TargetObject.tag == "Monster")
         {
-            if (TargetObject.GetComponent<AIBase>().BeAttacked(this))
-            {
-                 QuestMonsterUpdate(TargetObject.GetComponent<AIBase>());
-            }
+            _eventManager.OnPlayerAttack(this, TargetObject.GetComponent<AIBase>());
+
             AudioManager.GetInstance().OnShotPlay("Hit_Impact_Sword");
         }
     }
 
-    void AttackStart()
+    private void OnDestroyObject(Player player, ObjectController objectController)
+    {
+        if (player == this)
+        {
+
+        }
+    }
+
+
+
+    void OnAttackStart()
     {
         //Debug.Log("attack start");
         //_isAttacking = true;
     }
 
-    void AttackEnd()
+    void OnAttackEnd()
     {
         _isAttacking = false;
     }
@@ -729,7 +742,7 @@ public class Player : BaseInfo
     }
 
 
-    void QuestMonsterUpdate(AIBase monster)
+    public void QuestMonsterUpdate(AIBase monster)
     {
        for (int i = 0; i < _CollectionQuestList.Count; i++)
        {

@@ -5,6 +5,10 @@ using UnityEngine.AI;
 
 public class AIBase : BaseInfo
 {
+    //managers
+    EventManager _eventManager;
+
+
     [SerializeField] Animator _aiAnimator;
     [SerializeField] Player _player;
 
@@ -53,8 +57,13 @@ public class AIBase : BaseInfo
     float _sternTime;
     [SerializeField] float _sternCoolTIme = 3f;
 
-    void Start()
+    private void Awake()
     {
+        //managers
+        _eventManager = EventManager.Instance;
+        _eventManager.OnPlayerAttackEvent += OnBeAttack;
+
+
         _agent = gameObject.GetComponent<NavMeshAgent>();
         _agent.stoppingDistance = 2f;
         _sternTime = 0;
@@ -204,6 +213,43 @@ public class AIBase : BaseInfo
         }else
         {
             return true;
+        }
+    }
+
+    public void OnBeAttack(Player player, AIBase aiBase)
+    {
+        if (aiBase == this)
+        {
+            if (hp > 0)
+            {
+                int debugD = Random.Range(player.minDamage + player.addMinDamage, player.maxDamage + player.addMaxDamage);
+                hp -= debugD;
+
+                //데미지 창
+                UIManager.GetInstance().ObjectHP.SetName(objectName);
+                UIManager.GetInstance().ObjectHP.SetHpBar((float)hp / (float)maxHp);
+                UIManager.GetInstance().ObjectHP.ViewHP();
+
+                if (hp < 0)
+                {
+                    _aiAnimator.SetBool("Die", true);
+                    _aiAnimator.SetTrigger("hit");
+                    gameObject.layer = LayerMask.NameToLayer("ImpossibleHit");
+                    //재료 드랍
+                    Debug.Log("object드랍");
+                    player.QuestMonsterUpdate(aiBase);
+                }
+
+                if (!_aiAnimator.GetCurrentAnimatorStateInfo(0).IsName("Attack01"))
+                {
+                    //애니메이션
+                    _aiAnimator.SetTrigger("hit");
+                }
+            }
+            else
+            {
+                player.QuestMonsterUpdate(aiBase);
+            }
         }
     }
 

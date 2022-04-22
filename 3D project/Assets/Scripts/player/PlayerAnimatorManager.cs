@@ -4,27 +4,38 @@ using UnityEngine;
 
 public class PlayerAnimatorManager : MonoBehaviour
 {
-    public delegate void HitHandler();
-    public event HitHandler HitEvent;
+    public delegate void HitDelegate();
+    public event HitDelegate HitEvent;
 
-    public delegate void AttackStartHandler();
-    public event AttackStartHandler AttackStartEvent;
+    public delegate void AttackStartDelegate();
+    public event AttackStartDelegate AttackStartEvent;
 
-    public delegate void AttackEndHandler();
-    public event AttackEndHandler AttackEndEvent;
+    public delegate void AttackEndDelegate();
+    public event AttackEndDelegate AttackEndEvent;
 
-    void Hit()
+
+
+    void OnHit()
     {
-        HitEvent();
+        if (HitEvent != null)
+        {
+            HitEvent();
+        }
     }
 
-    void AttackStart()
+    void OnAttackStart()
     {
-        AttackStartEvent();
+        if (AttackStartEvent != null)
+        {
+            AttackStartEvent();
+        }   
     }
 
-    void AttackEnd()
+    void OnAttackEnd()
     {
-        AttackEndEvent();
+        if (AttackEndEvent != null)
+        {
+            AttackEndEvent();
+        }  
     }
 }
