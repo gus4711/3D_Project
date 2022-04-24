@@ -9,8 +9,15 @@ using Newtonsoft.Json;
 
 public class Inventory : SlotWindowBase
 {
+
+    //managers
+    EventManager _eventManager;
+
     void Start()
     {
+        //managers
+        _eventManager = EventManager.Instance;
+
         _quickSlots = GameObject.FindGameObjectsWithTag("QuickSlot");
 
 
@@ -45,7 +52,8 @@ public class Inventory : SlotWindowBase
             }
         }
 
-        user.GetItemEvent += getItem;
+        //_eventManager.OnGetItemEvent += getItem;
+        _eventManager.OnInteractionEvent += getItem;
         user.GetItemsNameEvent += GetItemsName;
         user.QuestItemUpdateEvent += QuestItemUpdate;
         user.QuestItemCheck += QuestItemCheck;

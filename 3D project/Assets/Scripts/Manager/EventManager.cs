@@ -7,11 +7,19 @@ public class EventManager : Singleton<EventManager>
     public delegate void OnPlayerAttackDelegate(Player player, AIBase aiBase);
     public event OnPlayerAttackDelegate OnPlayerAttackEvent;
 
-    public delegate void OnDestoryObjectDelegate(Player player, ObjectController objectController);
-    public event OnDestoryObjectDelegate OnDestoryObjectEvent;
+    public delegate void OnHitDelegate(Player player, ObjectController objectController);
+    public event OnHitDelegate OnDestoryObjectEvent;
 
-    public delegate void OnAttackHitSoundDelegate(Player player, ObjectController objectController);
-    public event OnAttackHitSoundDelegate OnAttackHitSoundEvent;
+    public event OnHitDelegate OnAttackHitSoundEvent;
+
+    public delegate void OnGetItemDelegate(Player player, ObjectInfo objectInfo);
+    public event OnGetItemDelegate OnGetItemEvent;
+
+
+
+    public delegate void OnInteractionDelegate(Player player, GameObject go);
+    public event OnInteractionDelegate OnInteractionEvent;
+
 
     public void OnPlayerAttack(Player player, AIBase aiBase)
     {
@@ -25,5 +33,16 @@ public class EventManager : Singleton<EventManager>
             OnDestoryObjectEvent(player, objectController);
     }
 
+    public void OnGetItem(Player player, ObjectInfo go)
+    {
+        if (OnGetItemEvent != null)
+            OnGetItemEvent(player, go);
+    }
+
+    public void OnInteraction(Player player, GameObject go)
+    {
+        if (OnInteractionEvent != null)
+            OnInteractionEvent(player, go);
+    }
 
 }

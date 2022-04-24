@@ -271,7 +271,7 @@ public class SlotWindowBase : MonoBehaviour
         }
     }
 
-    protected void getItem(ObjectInfo oi)
+    protected void getItem(Player player, ObjectInfo oi)
     {
         LastSlot = null;
         foreach (Slot s in slotList)
@@ -298,6 +298,40 @@ public class SlotWindowBase : MonoBehaviour
         }
         LastSlot.isWeapon = oi.isWeapon;
         LastSlot.isPossibleUse = oi.IsPossibleUse;
+    }
+
+    protected void getItem(Player player, GameObject go)
+    {
+        ObjectInfo oi = go.GetComponent<ObjectInfo>();
+
+        if (oi != null)
+        {
+            LastSlot = null;
+            foreach (Slot s in slotList)
+            {
+                if (s.GetItemIndex() == oi.itemIndex && (!oi.isWeapon))
+                {
+                    LastSlot = s;
+                    break;
+                }
+                else if (s.GetItemIndex() == -1 && LastSlot == null)
+                {
+                    LastSlot = s;
+                    continue;
+                }
+            }
+
+            LastSlot.SetItemCount(LastSlot.GetItemCount() + oi.count);
+            LastSlot.SetViewCount(LastSlot.GetItemCount().ToString());
+            if (LastSlot.GetItemIndex() == -1)
+            {
+                LastSlot.SetItemIndex(oi.itemIndex);
+                LastSlot.SetItemName(oi.objectName);
+                LastSlot.SetViewImage(oi.itemImage);
+            }
+            LastSlot.isWeapon = oi.isWeapon;
+            LastSlot.isPossibleUse = oi.IsPossibleUse;
+        }
     }
 
     public bool GetItemsName(List<ResultObject> objectNames)
@@ -366,7 +400,7 @@ public class SlotWindowBase : MonoBehaviour
             {
                 for (int j = 0; j < objectNames[i].count; j++)
                 {
-                    getItem(oiList[i]);
+                    getItem(null, oiList[i]);
                 }
             }
 

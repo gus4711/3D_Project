@@ -44,7 +44,7 @@ public class UIManager : Singleton<UIManager>
 
     private void Start()
     {
-        _palyer.OnNpcTalkEvent += NpcTalk;
+        //_palyer.OnNpcTalkEvent += NpcTalk;
         _palyer.GameOverEvent += GameOver;
         npcTalk = _npcTack.GetComponent<NPCTalk>();
     }
@@ -149,7 +149,7 @@ public class UIManager : Singleton<UIManager>
     }
 
 
-    void NpcTalk(string npcName, Player player)
+    public void NpcTalk(string npcName, Player player)
     {
         Debug.Log("talk start");
         _npcTack.SetActive(true);

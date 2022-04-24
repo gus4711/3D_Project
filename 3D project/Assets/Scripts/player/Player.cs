@@ -12,9 +12,6 @@ public class Player : BaseInfo
     public delegate void HMPSHandler(Player playerScript);
     public event HMPSHandler OnHMPSEvent;
 
-    public delegate void getItemHandler(ObjectInfo go);
-    public event getItemHandler GetItemEvent;
-
     public delegate bool getItemsNameHandler(List<ResultObject> goName);
     public event getItemsNameHandler GetItemsNameEvent;
 
@@ -127,8 +124,8 @@ public class Player : BaseInfo
 
 
     //파밍, 아이템 사용
-    bool _isGetItem = false;
-    bool _isgetItem_o = true;
+    bool _isActionKey_E = false;
+    bool _isgetItemOneClick = true;
 
     bool _useItem;
 
@@ -179,7 +176,7 @@ public class Player : BaseInfo
             CameraUpdate();
             InputKey();
             characterController();
-            Farming();
+            KeyActionE();
             UseItemCheck();
         }else
         {
@@ -194,7 +191,7 @@ public class Player : BaseInfo
         _mouseRightDown = false;
         _isSitDown = false;
         _isRun = false;
-        _isGetItem = false;
+        _isActionKey_E = false;
         _useItem = false;
     }
 
@@ -282,11 +279,11 @@ public class Player : BaseInfo
         //파밍
         if (Input.GetKey(KeyCode.E))
         {
-            _isGetItem = true;
+            _isActionKey_E = true;
         }
         else
         {
-            _isGetItem = false;
+            _isActionKey_E = false;
         }
 
         if (Input.GetKeyDown(KeyCode.R))
@@ -534,32 +531,37 @@ public class Player : BaseInfo
     }
     
 
-    void Farming()
+    void KeyActionE()
     {
-        if (_isGetItem)
+        if (_isActionKey_E)
         {
-            if (_isgetItem_o)
+            if (_isgetItemOneClick)
             {
-                _isgetItem_o = false;
+                _isgetItemOneClick = false;
                 
                 ray = Camera.main.ViewportPointToRay(_cameraCenter);
                 if (Physics.Raycast(ray, out raycasthit, 2f, (1 << LayerMask.NameToLayer("ImpossibleHit"))|(1<<LayerMask.NameToLayer("NPC"))))
                 {
-                    if(raycasthit.collider.tag == "item")
-                    {
-                        GetItemEvent(raycasthit.collider.GetComponent<ObjectInfo>());
-                        GameObject.Destroy(raycasthit.collider.gameObject);
-                        QuestItemUpdateEvent(this, raycasthit.collider.GetComponent<ObjectInfo>(), false);
-                    }else if(raycasthit.collider.tag == "npc")
-                    {
-                        OnNpcTalkEvent(raycasthit.collider.gameObject.GetComponent < NPC>().npcName, this);
-                    }
+                    _eventManager.OnInteraction(this, raycasthit.collider.gameObject);
+                    
+
+                    //if(raycasthit.collider.tag == "item")
+                    //{
+                    //    ObjectInfo oi = raycasthit.collider.GetComponent<ObjectInfo>();
+
+                    //    _eventManager.OnGetItem(this, oi);
+                    //    GameObject.Destroy(raycasthit.collider.gameObject);
+                    //    QuestItemUpdateEvent(this, oi, false);
+                    //}else if(raycasthit.collider.tag == "npc")
+                    //{
+                    //    OnNpcTalkEvent(raycasthit.collider.gameObject.GetComponent < NPC>().npcName, this);
+                    //}
                 }
             }
         }
         else
         {
-            _isgetItem_o = true;
+            _isgetItemOneClick = true;
         }
     }
 
@@ -758,7 +760,7 @@ public class Player : BaseInfo
 
     public void addItem(ObjectInfo objectinfo)
     {
-        GetItemEvent(objectinfo);
+        _eventManager.OnGetItem(this, objectinfo);
     }
     public bool AddItem(List<ResultObject> resultObject)
     {

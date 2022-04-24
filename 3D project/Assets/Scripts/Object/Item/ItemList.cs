@@ -9,23 +9,20 @@ public class ItemListManager : Singleton<ItemListManager>
     Dictionary<int, GameObject> itemListIndexDictionary = new Dictionary<int, GameObject>();
     Dictionary<string, Sprite> itemImageListDictionary = new Dictionary<string, Sprite>();
 
-    GameObject[] itemObjects;
-    
-    Sprite[] itemImage;
-
+    //managers
+    ResourcesManager _resourcesManager;
 
     private void Awake()
     {
-        itemObjects = Resources.LoadAll<GameObject>("Object");
-        itemImage = Resources.LoadAll<Sprite>("Image");
+        _resourcesManager = ResourcesManager.Instance;
 
-        foreach (GameObject go in itemObjects)
+        foreach (GameObject go in _resourcesManager.itemObjects)
         {
             itemListDictionary.Add(go.GetComponent<ObjectInfo>().objectName, go);
             itemListIndexDictionary.Add(go.GetComponent<ObjectInfo>().itemIndex, go);
         }
 
-        foreach (Sprite sp in itemImage)
+        foreach (Sprite sp in _resourcesManager.itemImage)
         {
             itemImageListDictionary.Add(sp.name, sp);
         }

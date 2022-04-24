@@ -76,6 +76,7 @@ public class Slot : MonoBehaviour
         et_entry.eventID = EventTriggerType.PointerClick;
         et_entry.callback.AddListener((data) => { OnPointerClick((PointerEventData)data); });
         eventTrigger.triggers.Add(et_entry);
+
     }
 
     public void SlotInit()

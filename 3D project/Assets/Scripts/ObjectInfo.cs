@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,4 +27,22 @@ public class ObjectInfo : MonoBehaviour
     public bool Mulipleobject;
     public bool IsPossibleUse;
     public Sprite itemImage;
+
+    //managers
+    EventManager _eventManager;
+
+    private void Awake()
+    {
+        _eventManager = EventManager.Instance;
+
+        _eventManager.OnInteractionEvent += OnInteraction;
+    }
+
+    private void OnInteraction(Player player, GameObject go)
+    {
+        if (go.GetComponent<ObjectInfo>() == this)
+        {
+            Destroy(gameObject);
+        }
+    }
 }
